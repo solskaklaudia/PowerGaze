@@ -2,3 +2,4 @@ opencv_python == 4.5.3.56
 numpy == 1.21.2
 mediapipe == 0.8.8.1
 autopy == 4.0.0
+pynput == 1.7.4
