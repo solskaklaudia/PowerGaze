@@ -1,14 +1,33 @@
 from lines import *
+import numpy as np
+import cv2
 
 class Eye:
 
     max_samples = 5                 # max amount of pupil coordinates samples for smoothing
+    sight_angle = [0,0]             # predicted angle of sight
+    max_cursor_samples = 10
 
     def __init__(self,name):
 
         self.name = name
         self.pupil_coords = []       # array of calculated raw pupil coordinates (x,y)
         self.avg_coords = [0,0]      # averaged out pupil coordinates for smoother movement
+        self.middle = [0,0]
+
+        self.middle_coords = []
+        self.avg_middle = [0,0]
+
+        self.cursor_coords = []
+        self.avg_cursor = [0,0]
+
+        self.sight_angle_matrix = [[[0.62, 5.04],[3.52, 4.84],[5.28, 5.39]],
+                                    [[0.74, 4.38],[3.57,3.84],[5.43, 4.26]],
+                                    [[0.83, 2.61],[3.39, 2.63],[5.74, 3.68]]]
+
+        self.screen_px_matrix = [[[128,110],[970,110],[1810,110]],
+                                    [[128,550],[970,550],[1810,550]],
+                                    [[128,980],[970, 980],[1810, 980]]]
 
 
     def setLandmarks(self, landmarks):
@@ -35,82 +54,107 @@ class Eye:
         self.avg_coords[0] = avg_x/weighs_sum
         self.avg_coords[1] = avg_y/weighs_sum
 
-
-    def getEye(self, frame):
-        """ Gets eye image using eye landmarks, converts to grayscale and equalizes its histogram """
-
-        y1 = int(min(self.landmarks[1]) * frame.shape[0])
-        y2 = int(max(self.landmarks[1]) * frame.shape[0])
-        x1 = int(min(self.landmarks[0]) * frame.shape[1])
-        x2 = int(max(self.landmarks[0]) * frame.shape[1])
-
-        self.roi_pos = ((x1, y1), (x2, y2))
-
-        image = frame[y1:y2, x1:x2]
-        hsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
-        gray = hsv[:,:,2]
-
-        gray = cv2.GaussianBlur(gray, (21, 21), 0)
-        gray = cv2.equalizeHist(gray)
-
-        gray = cv2.resize(gray, (150,100), interpolation = cv2.INTER_LINEAR)
-
-        self.eye_image = gray
-
     
-    def findPupil(self, show = True):
-        """ Finds pupil center coordinates (x,y) """
+    def smoothMiddleMovement(self, c_coords):
+        """ Smooths middle of the eye movement using weighed moving average """
 
-        threshold_p = 10
+        self.middle_coords.append(c_coords)
+
+        if len(self.middle_coords) > self.max_samples:
+            self.middle_coords.pop(0)
+
+        avg_x = 0
+        avg_y = 0
+        weighs_sum = 0
+
+        for i in range(len(self.middle_coords)):
+            avg_x += (i+1)*self.middle_coords[i][0]
+            avg_y += (i+1)*self.middle_coords[i][1]
+            weighs_sum += (i+1)
+
+        self.avg_middle[0] = avg_x/weighs_sum
+        self.avg_middle[1] = avg_y/weighs_sum
+
+
+    def smoothCursorMovement(self, c_coords):
+        """ Smooths cursor movement using weighed moving average """
+
+        # append the sample when less than max cursor samples and calculate average
+        if len(self.cursor_coords) <= self.max_cursor_samples:
+            self.cursor_coords.append(c_coords)
+            avg_x = 0
+            avg_y = 0
+            weighs_sum = 0
+
+            for i in range(len(self.cursor_coords)):
+                avg_x += (i+1)*self.cursor_coords[i][0]
+                avg_y += (i+1)*self.cursor_coords[i][1]
+                weighs_sum += (i+1)
+
+            self.avg_cursor[0] = avg_x/weighs_sum
+            self.avg_cursor[1] = avg_y/weighs_sum
+
+        # when max samples reached, accept only those which differ more than given number of pixels
+        diff_x = abs(self.cursor_coords[len(self.cursor_coords)-1][0] - c_coords[0])
+        diff_y = abs(self.cursor_coords[len(self.cursor_coords)-1][1] - c_coords[1])
+
+        if(diff_x > 100 and diff_y > 100):
+
+            self.cursor_coords.append(c_coords)
+
+            if len(self.cursor_coords) > self.max_cursor_samples:
+                self.cursor_coords.pop(0)
+
+            avg_x = 0
+            avg_y = 0
+            weighs_sum = 0
+
+            for i in range(len(self.cursor_coords)):
+                avg_x += (i+1)*self.cursor_coords[i][0]
+                avg_y += (i+1)*self.cursor_coords[i][1]
+                weighs_sum += (i+1)
+
+            self.avg_cursor[0] = avg_x/weighs_sum
+            self.avg_cursor[1] = avg_y/weighs_sum
+
+
+    def setPupil(self, point):
+        """ Sets pupil center point"""
+        self.smoothPupilMovement(point)
+    
+
+    def calcMiddle(self, frame, landmarks):
+        """ Calculates eye middle point coordinates"""
+
+        self.middle[0] = ((landmarks[0][0] + landmarks[1][0]) / 2 ) * frame.shape[1]
+        self.middle[1] = ((landmarks[0][1] + landmarks[1][1]) / 2 ) * frame.shape[0]
         
-        _, binarized_p = cv2.threshold(self.eye_image, threshold_p, 255, cv2.THRESH_BINARY_INV)
+        self.eye_width = abs(landmarks[0][0] - landmarks[1][0]) * frame.shape[1]
 
-        # morphological opening to get rid of noise
-        gray = cv2.morphologyEx(binarized_p, cv2.MORPH_OPEN, cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (7, 7)))
-        
-        # find most external contours
-        cnts, _ = cv2.findContours(gray, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
-
-        if cnts:
-
-            if len(cnts) > 1:
-                # find contour centers
-                cnt_centers = []
-
-                for c in cnts :
-                    cX, cY = c.mean(axis=0)[0]
-                    cnt_centers.append((cX, cY))
-
-                # find contour closest to the image center
-                img_center = [75, 50]
-                min_dist_cnt = [cnts[0], 200]
-
-                for i in range(len(cnt_centers)):
-                    dist = (img_center[0] - cnt_centers[i][0])**2 + (img_center[1] - cnt_centers[i][1])**2
-                    if (dist < min_dist_cnt[1]):
-                        min_dist_cnt = [cnts[i], dist]
-
-                c = min_dist_cnt[0]
-
-            else:
-                c = cnts[0]
-        
-            # fit an ellipse
-            result = self.eye_image.copy()
-            ((centx,centy), (width,height), angle) = cv2.fitEllipse(c)
-            res = cv2.ellipse(result, (int(centx),int(centy)), (int(width/2),int(height/2)), angle, 0, 360, (255,255,255), 1)
-
-            # calculate pupil coordinates in original frame
-            self.pup_x = self.roi_pos[0][0] + (centx/150 * (self.roi_pos[1][0]-self.roi_pos[0][0]))
-            self.pup_y = self.roi_pos[0][1] + (centy/100 * (self.roi_pos[1][1]-self.roi_pos[0][1]))
+        self.smoothMiddleMovement(self.middle)
 
 
-            self.smoothPupilMovement([self.pup_x, self.pup_y])
+    def calcAngle(self):
+        """ Calculates angle od the sight in x and y directions """
 
-            # display eye and predicted pupil
-            if(show):
-                cv2.imshow("Eye " + self.name, res)
-                cv2.imshow("Pupil " + self.name, gray)
+        # distance between middle and pupil center in x and y directions
+        pup_dist_x = self.avg_middle[0] - self.avg_coords[0]
+        pup_dist_y = self.avg_middle[1] - self.avg_coords[1]
+
+        # calculates sight angle
+        self.sight_angle[0] = math.atan(pup_dist_x / self.eye_width) * 180 / math.pi
+        self.sight_angle[1] = math.atan(pup_dist_y / self.eye_width) * 180 / math.pi
+
+        # calculates cursor coordinates
+        train_pts = np.float32(self.screen_px_matrix).reshape(-1,1,2)
+        query_pts = np.float32(self.sight_angle_matrix).reshape(-1,1,2)
+
+        matrix, _ = cv2.findHomography(query_pts, train_pts, cv2.RANSAC, 5.0)
+
+        pts = np.float32([self.sight_angle]).reshape(-1,1,2)
+
+        self.cursor = cv2.perspectiveTransform(pts,matrix).flatten()
+        self.smoothCursorMovement(self.cursor)
 
 
     def detectBlink(self, landmarks):

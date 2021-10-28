@@ -3,11 +3,25 @@ import math
 
 class Head:
 
-    distance = 50 # estimated distance from the camera in cm
+    camera_distance = 0             # estimated distance from the camera in cm
+    eyes_distance = 0               # normalized distance between eyes
 
-    def calcDistance(self):
-        """ Calculates distance of a person from camera """
-        self.distance = 50 # TODO
+    def calcDistance(self, landmarks):
+        """ Estimates distance of a person from camera """
+
+        # landmark points needed for calculation
+        r_eye = (landmarks[133].x, landmarks[133].y, landmarks[133].z)      # right eye corner point
+        l_eye = (landmarks[362].x, landmarks[362].y, landmarks[362].z)      # left eye corner point
+
+        # distance between eyes
+        dist = lineLength(r_eye, l_eye)
+        if (self.eyes_distance == 0):
+            self.eyes_distance = dist
+            self.camera_distance = 50   # TODO - 50 is a default value as of now
+        else:    
+            self.camera_distance = self.eyes_distance / dist * self.camera_distance
+            self.eyes_distance = dist
+
 
     def calcAngles(self, frame, landmarks, visualize = False):
         """ Calculates head position angles in 3D space relative to the camera """
