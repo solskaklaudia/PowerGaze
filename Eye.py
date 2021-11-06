@@ -1,12 +1,18 @@
 from lines import *
 import numpy as np
 import cv2
+import statistics as st
 
 class Eye:
 
-    max_samples = 5                 # max amount of pupil coordinates samples for smoothing
-    sight_angle = [0,0]             # predicted angle of sight
+    max_samples = 5                  # max amount of pupil coordinates samples for smoothing
     max_cursor_samples = 10
+
+    # Matrix containing pixel position of 9 calibration points on the screen
+    screen_px_matrix = [[[0,0],[1,0],[2,0]],
+                        [[0,1],[1,1],[2,1]],
+                        [[0,2],[1,2],[2,2]]]
+
 
     def __init__(self,name):
 
@@ -18,16 +24,15 @@ class Eye:
         self.middle_coords = []
         self.avg_middle = [0,0]
 
+        self.sight_angle = [0,0]     # predicted angle of sight
+
         self.cursor_coords = []
         self.avg_cursor = [0,0]
 
-        self.sight_angle_matrix = [[[0.62, 5.04],[3.52, 4.84],[5.28, 5.39]],
-                                    [[0.74, 4.38],[3.57,3.84],[5.43, 4.26]],
-                                    [[0.83, 2.61],[3.39, 2.63],[5.74, 3.68]]]
-
-        self.screen_px_matrix = [[[128,110],[970,110],[1810,110]],
-                                    [[128,550],[970,550],[1810,550]],
-                                    [[128,980],[970, 980],[1810, 980]]]
+        # Matrix containing angles corresponding to 9 callibration points
+        self.sight_angle_matrix = [[[0,0],[1,0],[2,0]],
+                        [[0,1],[1,1],[2,1]],
+                        [[0,2],[1,2],[2,2]]]
 
 
     def setLandmarks(self, landmarks):
@@ -87,9 +92,9 @@ class Eye:
             weighs_sum = 0
 
             for i in range(len(self.cursor_coords)):
-                avg_x += (i+1)*self.cursor_coords[i][0]
-                avg_y += (i+1)*self.cursor_coords[i][1]
-                weighs_sum += (i+1)
+                avg_x += self.cursor_coords[i][0]
+                avg_y += self.cursor_coords[i][1]
+                weighs_sum += 1
 
             self.avg_cursor[0] = avg_x/weighs_sum
             self.avg_cursor[1] = avg_y/weighs_sum
@@ -98,7 +103,7 @@ class Eye:
         diff_x = abs(self.cursor_coords[len(self.cursor_coords)-1][0] - c_coords[0])
         diff_y = abs(self.cursor_coords[len(self.cursor_coords)-1][1] - c_coords[1])
 
-        if(diff_x > 100 and diff_y > 100):
+        if(diff_x > 50 and diff_y > 50):
 
             self.cursor_coords.append(c_coords)
 
@@ -110,12 +115,26 @@ class Eye:
             weighs_sum = 0
 
             for i in range(len(self.cursor_coords)):
-                avg_x += (i+1)*self.cursor_coords[i][0]
-                avg_y += (i+1)*self.cursor_coords[i][1]
-                weighs_sum += (i+1)
+                avg_x += self.cursor_coords[i][0]
+                avg_y += self.cursor_coords[i][1]
+                weighs_sum += 1
 
             self.avg_cursor[0] = avg_x/weighs_sum
             self.avg_cursor[1] = avg_y/weighs_sum
+
+
+    def calibrate(self, p1, p2, p3, p4, p5, p6, p7, p8, p9):
+        """ Sets sight angle matrix after calibration """
+
+        points = [p1, p2, p3, p4, p5, p6, p7, p8, p9]
+
+        for p in range(len(points)):
+            px, py = zip(*points[p])
+            px = st.median(px)
+            py = st.median(py)
+            column = p%3
+            row = int(p/3)
+            self.sight_angle_matrix[row][column] = [px, py]
 
 
     def setPupil(self, point):
@@ -126,12 +145,14 @@ class Eye:
     def calcMiddle(self, frame, landmarks):
         """ Calculates eye middle point coordinates"""
 
-        self.middle[0] = ((landmarks[0][0] + landmarks[1][0]) / 2 ) * frame.shape[1]
-        self.middle[1] = ((landmarks[0][1] + landmarks[1][1]) / 2 ) * frame.shape[0]
+        middle = [0,0]
+
+        middle[0] = ((landmarks[0][0] + landmarks[1][0]) / 2 ) * frame.shape[1]
+        middle[1] = ((landmarks[0][1] + landmarks[1][1]) / 2 ) * frame.shape[0]
         
         self.eye_width = abs(landmarks[0][0] - landmarks[1][0]) * frame.shape[1]
 
-        self.smoothMiddleMovement(self.middle)
+        self.smoothMiddleMovement(middle)
 
 
     def calcAngle(self):
@@ -149,11 +170,13 @@ class Eye:
         train_pts = np.float32(self.screen_px_matrix).reshape(-1,1,2)
         query_pts = np.float32(self.sight_angle_matrix).reshape(-1,1,2)
 
-        matrix, _ = cv2.findHomography(query_pts, train_pts, cv2.RANSAC, 5.0)
+        # finds homography using least squares method
+        matrix, _ = cv2.findHomography(query_pts, train_pts, 0)
 
+        # calculates cursor position
         pts = np.float32([self.sight_angle]).reshape(-1,1,2)
-
         self.cursor = cv2.perspectiveTransform(pts,matrix).flatten()
+
         self.smoothCursorMovement(self.cursor)
 
 

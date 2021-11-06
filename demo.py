@@ -2,7 +2,11 @@ import cv2
 import mediapipe as mp
 from Eye import *
 from Head import *
+from Menu import *
 import autopy
+from subprocess import Popen
+import time
+import statistics as st
 
 webcam = cv2.VideoCapture(0)
 
@@ -18,11 +22,26 @@ mpDraw = mp.solutions.drawing_utils
 mpFaceMesh = mp.solutions.face_mesh
 faceMesh = mpFaceMesh.FaceMesh(refine_landmarks=True)
 
-# create head and eye objects
+# create objects
 head = Head()
 left_eye = Eye("left")
 right_eye = Eye("right")
+functions_menu = Menu("functions menu")
 
+calibrated = False
+calibration_finished = False
+
+p1r, p2r, p3r, p4r, p5r, p6r, p7r, p8r, p9r = ([] for i in range(9))
+p1l, p2l, p3l, p4l, p5l, p6l, p7l, p8l, p9l = ([] for i in range(9))
+
+screen_width, screen_height = autopy.screen.size()
+
+margin = 0.15 * screen_height
+
+Eye.screen_px_matrix = [[[margin,margin],[screen_width/2,margin],[screen_width-margin,margin]],
+                        [[margin,screen_height/2],[screen_width/2,screen_height/2],[screen_width-margin,screen_height/2]],
+                        [[margin,screen_height-margin],[screen_width/2, screen_height-margin],[screen_width-margin, screen_height-margin]]]
+                        
 
 while True:
     # new frame from the webcam
@@ -100,28 +119,86 @@ while True:
 
             cv2.putText(frame, "right eye angle x: " + str(right_eye.sight_angle[0]), (50, 230), cv2.FONT_HERSHEY_DUPLEX, 0.9, (147, 58, 31), 1)
             cv2.putText(frame, "right eye angle y: " + str(right_eye.sight_angle[1]), (50, 260), cv2.FONT_HERSHEY_DUPLEX, 0.9, (147, 58, 31), 1)
+            cv2.putText(frame, "left eye angle x: " + str(left_eye.sight_angle[0]), (50, 290), cv2.FONT_HERSHEY_DUPLEX, 0.9, (147, 58, 31), 1)
+            cv2.putText(frame, "left eye angle y: " + str(left_eye.sight_angle[1]), (50, 320), cv2.FONT_HERSHEY_DUPLEX, 0.9, (147, 58, 31), 1)
 
 
             """ Move cursor """
-            cursor_x = right_eye.avg_cursor[0]
-            cursor_y = right_eye.avg_cursor[1]
+
+            cursor_x = (right_eye.avg_cursor[0] + left_eye.avg_cursor[0]) / 2
+            cursor_y = (right_eye.avg_cursor[1] + left_eye.avg_cursor[1]) / 2
 
             # draw cursor coordinates
-            cv2.putText(frame, "cursor x: " + str(cursor_x), (50, 290), cv2.FONT_HERSHEY_DUPLEX, 0.9, (147, 58, 31), 1)
-            cv2.putText(frame, "cursor y: " + str(cursor_y), (50, 320), cv2.FONT_HERSHEY_DUPLEX, 0.9, (147, 58, 31), 1) 
+            cv2.putText(frame, "cursor x: " + str(cursor_x), (50, 350), cv2.FONT_HERSHEY_DUPLEX, 0.9, (147, 58, 31), 1)
+            cv2.putText(frame, "cursor y: " + str(cursor_y), (50, 380), cv2.FONT_HERSHEY_DUPLEX, 0.9, (147, 58, 31), 1) 
 
             # edge cases
-            width, height = autopy.screen.size()
-
             if(cursor_x < 0.0):
                 cursor_x = 0.0
-            if (cursor_x >= width):
-                cursor_x = width-1
+            if (cursor_x >= screen_width):
+                cursor_x = screen_width-1
             if(cursor_y < 0.0):
+                # if(functions_menu.visible == False):
+                #     Popen('python functions_menu.py')
+                #     functions_menu.visible = True
                 cursor_y = 0.0
-            if (cursor_y >= height):
-                cursor_y = height-1
+            if (cursor_y >= screen_height):
+                cursor_y = screen_height-1
+
+
+            """ Calibration """
+
+            if(calibrated == False):
+                Popen('python calibration.py')
+                calibration_start = time.time()
+                calibrated = True
+
+            t = time.time() - calibration_start
+
+            if(int(t) == 3):
+                p1r.append(right_eye.sight_angle.copy())
+                p1l.append(left_eye.sight_angle.copy())
+            elif(int(t) == 5):
+                p2r.append(right_eye.sight_angle.copy())
+                p2l.append(left_eye.sight_angle.copy())
+            elif(int(t) == 7):
+                p3r.append(right_eye.sight_angle.copy())
+                p3l.append(left_eye.sight_angle.copy())
+
+            elif(int(t) == 9):
+                p4r.append(right_eye.sight_angle.copy())
+                p4l.append(left_eye.sight_angle.copy())
+            elif(int(t) == 11):
+                p5r.append(right_eye.sight_angle.copy())
+                p5l.append(left_eye.sight_angle.copy())
+            elif(int(t) == 13):
+                p6r.append(right_eye.sight_angle.copy())
+                p6l.append(left_eye.sight_angle.copy())
+
+            elif(int(t) == 15):
+                p7r.append(right_eye.sight_angle.copy())
+                p7l.append(left_eye.sight_angle.copy())
+            elif(int(t) == 17):
+                p8r.append(right_eye.sight_angle.copy())
+                p8l.append(left_eye.sight_angle.copy())
+            elif(int(t) == 19):
+                p9r.append(right_eye.sight_angle.copy())
+                p9l.append(left_eye.sight_angle.copy())
             
+
+            if(t > 20 and calibration_finished == False):
+
+                right_eye.calibrate(p1r, p2r, p3r, p4r, p5r, p6r, p7r, p8r, p9r)
+                left_eye.calibrate(p1l, p2l, p3l, p4l, p5l, p6l, p7l, p8l, p9l)
+
+                print("right eye:")
+                print(right_eye.sight_angle_matrix)
+
+                print("left eye:")
+                print(left_eye.sight_angle_matrix)
+
+                calibration_finished = True
+
             autopy.mouse.move(cursor_x, cursor_y)
     
     cv2.imshow("Demo", frame)
