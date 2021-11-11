@@ -28,6 +28,8 @@ right_eye = Eye("right")
 cursor = Cursor()
 
 functions_menu = None
+mouse_menu = None
+keyboard = None
 
 # Calibration variables
 calibrated = False
@@ -162,6 +164,29 @@ while True:
                         poll = functions_menu.poll()
                         if(poll is not None):
                             functions_menu = Popen('python functions_menu.py')
+
+                # Open mouse menu if looking above the screen
+                if(cursor_y < 0 - 500):        
+                    if(mouse_menu is None):
+                        mouse_menu = Popen('python mouse_menu.py')
+                    else:
+                        poll = mouse_menu.poll()
+                        if(poll is not None):
+                            mouse_menu = Popen('python mouse_menu.py')
+
+                # Open keyboard if looking to the left of the screen
+                if(cursor_x < 0 - 500):        
+                    if(keyboard is None):
+                        keyboard = Popen("osk.exe", shell = True)
+                    else:
+                        poll = keyboard.poll()
+                        if(poll is not None):
+                            keyboard = Popen("osk.exe", shell = True)
+
+                # Close keyboard if looking to the right of the screen
+                if(cursor_x > screen_width + 500):        
+                    if(keyboard is not None):
+                        Popen("wmic process where name='osk.exe' delete", shell = True)
 
                 autopy.mouse.move(cursor.coordinates[0], cursor.coordinates[1])
             

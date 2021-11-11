@@ -1,6 +1,4 @@
 import tkinter as tk
-import os
-from subprocess import Popen
 
 root = tk.Tk()
 root.attributes('-alpha', 0.0)
@@ -20,58 +18,53 @@ window.attributes('-topmost', 1)            # display on top
 
 """ Functions """
 
-def open_keyboard(root):
+def zoomIn(root):
     root.destroy()
-    os.system('osk')
+    print("zoom")
 
-def open_mouse_menu(root):
+def returnToDefault(root):
     root.destroy()
-    Popen('python mouse_menu.py')
+    print("default screen")
+
+def redoCalibation(root):
+    root.destroy()
+    print("calibrate")
+
+def exitMenu(root):
+    root.destroy()
 
 
 """ Contents """
 
-# Open mouse menu button
-mouse_image = tk.PhotoImage(file="img\\functions\\mouse.png").subsample(2)
-mouse = tk.Button(window, command = lambda: open_mouse_menu(root), image=mouse_image)
-mouse["border"] = "0"
-mouse.grid(row=1,column=1,padx=80, pady=50)
-
 # Zoom in button
 zoom_image = tk.PhotoImage(file="img\\functions\\zoom.png").subsample(2)
-zoom = tk.Button(window, command = lambda: print("zoom"), image=zoom_image)
+zoom = tk.Button(window, command = lambda: zoomIn(root), image=zoom_image)
 zoom["border"] = "0"
-zoom.grid(row=1,column=2,padx=80, pady=50)
-
-# Open keyboard button
-keyboard_image = tk.PhotoImage(file="img\\functions\\keyboard.png").subsample(2)
-keyboard = tk.Button(window, command = lambda: open_keyboard(root), image=keyboard_image)
-keyboard["border"] = "0"
-keyboard.grid(row=1,column=3,padx=80, pady=50)
-
-# Calibrate the system button
-calibrate_image = tk.PhotoImage(file="img\\functions\\calibrate.png").subsample(2)
-calibrate = tk.Button(window, command = lambda: print("calibrate"), image=calibrate_image)
-calibrate["border"] = "0"
-calibrate.grid(row=2,column=1,padx=80, pady=50)
+zoom.grid(row=1,column=1,padx=100, pady=50)
 
 # Return to default screen button
 default_image = tk.PhotoImage(file="img\\functions\\default.png").subsample(2)
-default = tk.Button(window, command = lambda: print("default screen"), image=default_image)
+default = tk.Button(window, command = lambda: returnToDefault(root), image=default_image)
 default["border"] = "0"
-default.grid(row=2,column=2,padx=80, pady=50)
+default.grid(row=1,column=2,padx=100, pady=50)
+
+# Calibrate the system button
+calibrate_image = tk.PhotoImage(file="img\\functions\\calibrate.png").subsample(2)
+calibrate = tk.Button(window, command = lambda: redoCalibation(root), image=calibrate_image)
+calibrate["border"] = "0"
+calibrate.grid(row=2,column=1,padx=100, pady=50)
 
 # Exit menu button
 exit_image = tk.PhotoImage(file="img\\functions\\exit.png").subsample(2)
-exit = tk.Button(window, command = lambda: root.destroy(), image=exit_image)
+exit = tk.Button(window, command = lambda: exitMenu(root), image=exit_image)
 exit["border"] = "0"
-exit.grid(row=2,column=3,padx=80, pady=50)
+exit.grid(row=2,column=2,padx=100, pady=50)
 
 # Center the buttons
 window.rowconfigure(0, weight=1)
 window.rowconfigure(3, weight=1)
 window.columnconfigure(0, weight=1)
-window.columnconfigure(4, weight=1)
+window.columnconfigure(3, weight=1)
 
 
 window.mainloop()
