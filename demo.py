@@ -2,7 +2,6 @@ import cv2
 import mediapipe as mp
 from Eye import *
 from Head import *
-from Menu import *
 from Cursor import *
 import autopy
 from subprocess import Popen
@@ -26,8 +25,9 @@ faceMesh = mpFaceMesh.FaceMesh(refine_landmarks=True)
 head = Head()
 left_eye = Eye("left")
 right_eye = Eye("right")
-functions_menu = Menu("functions menu")
 cursor = Cursor()
+
+functions_menu = None
 
 # Calibration variables
 calibrated = False
@@ -155,10 +155,13 @@ while True:
                     cursor.stationary_counter = 0
 
                 # Open functions menu if looking below the screen
-                if(cursor_y > screen_height + 1000):
-                    if(functions_menu.visible == False):
-                        Popen('python functions_menu.py')
-                        functions_menu.visible = True
+                if(cursor_y > screen_height + 700):        
+                    if(functions_menu is None):
+                        functions_menu = Popen('python functions_menu.py')
+                    else:
+                        poll = functions_menu.poll()
+                        if(poll is not None):
+                            functions_menu = Popen('python functions_menu.py')
 
                 autopy.mouse.move(cursor.coordinates[0], cursor.coordinates[1])
             

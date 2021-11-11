@@ -1,5 +1,6 @@
 import tkinter as tk
 import os
+from subprocess import Popen
 
 root = tk.Tk()
 root.attributes('-alpha', 0.0)
@@ -23,12 +24,16 @@ def open_keyboard(root):
     root.destroy()
     os.system('osk')
 
+def open_mouse_menu(root):
+    root.destroy()
+    Popen('python mouse_menu.py')
+
 
 """ Contents """
 
 # Open mouse menu button
 mouse_image = tk.PhotoImage(file="img\\functions\\mouse.png").subsample(2)
-mouse = tk.Button(window, command = lambda: print("open mouse menu"), image=mouse_image)
+mouse = tk.Button(window, command = lambda: open_mouse_menu(root), image=mouse_image)
 mouse["border"] = "0"
 mouse.grid(row=1,column=1,padx=80, pady=50)
 
