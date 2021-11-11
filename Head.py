@@ -3,7 +3,7 @@ import math
 
 class Head:
 
-    camera_distance = 0             # estimated distance from the camera in cm
+    camera_distance = 0             # estimated distance change from the camera
     eyes_distance = 0               # normalized distance between eyes
 
     def calcDistance(self, landmarks):
@@ -17,7 +17,7 @@ class Head:
         dist = lineLength(r_eye, l_eye)
         if (self.eyes_distance == 0):
             self.eyes_distance = dist
-            self.camera_distance = 50   # TODO - 50 is a default value as of now
+            self.camera_distance = 1
         else:    
             self.camera_distance = self.eyes_distance / dist * self.camera_distance
             self.eyes_distance = dist

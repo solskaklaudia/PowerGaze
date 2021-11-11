@@ -44,7 +44,6 @@ keyboard = tk.Button(window, command = lambda: open_keyboard(root), image=keyboa
 keyboard["border"] = "0"
 keyboard.grid(row=1,column=3,padx=80, pady=50)
 
-
 # Calibrate the system button
 calibrate_image = tk.PhotoImage(file="img\\functions\\calibrate.png").subsample(2)
 calibrate = tk.Button(window, command = lambda: print("calibrate"), image=calibrate_image)
@@ -62,7 +61,6 @@ exit_image = tk.PhotoImage(file="img\\functions\\exit.png").subsample(2)
 exit = tk.Button(window, command = lambda: root.destroy(), image=exit_image)
 exit["border"] = "0"
 exit.grid(row=2,column=3,padx=80, pady=50)
-
 
 # Center the buttons
 window.rowconfigure(0, weight=1)

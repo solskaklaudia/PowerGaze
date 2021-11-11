@@ -103,7 +103,7 @@ class Eye:
         diff_x = abs(self.cursor_coords[len(self.cursor_coords)-1][0] - c_coords[0])
         diff_y = abs(self.cursor_coords[len(self.cursor_coords)-1][1] - c_coords[1])
 
-        if(diff_x > 50 and diff_y > 50):
+        if(diff_x > 50 or diff_y > 50):
 
             self.cursor_coords.append(c_coords)
 
