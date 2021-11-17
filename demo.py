@@ -10,11 +10,11 @@ import time
 webcam = cv2.VideoCapture(0)
 
 # Set webcam capture resolution
-def change_res(width, height):
+def changeRes(width, height):
     webcam.set(3, width)
     webcam.set(4, height)
 
-change_res(1280, 720)
+changeRes(1280, 720)
 
 # MediaPipe facial landmark detection
 mpDraw = mp.solutions.drawing_utils
@@ -91,6 +91,10 @@ while True:
             # Calculate sight angles
             left_eye.calcAngle()
             right_eye.calcAngle()
+
+            # Estimate cursor position
+            left_eye.calcCursorPos()
+            right_eye.calcCursorPos()
 
 
             """ Calibration """

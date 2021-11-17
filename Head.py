@@ -38,7 +38,7 @@ class Head:
         eyes_len = lineLength(r_eye, l_eye)
         nose_len = lineLength(b_nose, t_nose)
 
-        #angle calculations
+        # angle calculations
         self.roll = math.asin((r_eye[1] - l_eye[1]) / eyes_len) * 180 / math.pi
         self.yaw = math.asin((b_nose[0] - t_nose[0]) / nose_len) * 180 / math.pi
         self.pitch = math.asin((b_nose[1] - t_nose[1]) / nose_len) * 180 / math.pi

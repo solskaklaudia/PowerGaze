@@ -166,7 +166,10 @@ class Eye:
         self.sight_angle[0] = math.atan(pup_dist_x / self.eye_width) * 180 / math.pi
         self.sight_angle[1] = math.atan(pup_dist_y / self.eye_width) * 180 / math.pi
 
-        # calculates cursor coordinates
+
+    def calcCursorPos(self):
+        """ Estimates cursor coordinates using homography """
+
         train_pts = np.float32(self.screen_px_matrix).reshape(-1,1,2)
         query_pts = np.float32(self.sight_angle_matrix).reshape(-1,1,2)
 
