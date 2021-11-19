@@ -1,4 +1,5 @@
 import tkinter as tk
+from subprocess import Popen
 
 root = tk.Tk()
 root.attributes('-alpha', 0.0)
@@ -20,11 +21,11 @@ window.attributes('-topmost', 1)            # display on top
 
 def zoomIn(root):
     root.destroy()
-    print("zoom")
+    Popen("Magnify.exe", shell=True)
 
 def returnToDefault(root):
     root.destroy()
-    print("default screen")
+    Popen("wmic process where name='Magnify.exe' delete", shell = True)
 
 def redoCalibation(root):
     root.destroy()
@@ -42,7 +43,7 @@ zoom = tk.Button(window, command = lambda: zoomIn(root), image=zoom_image)
 zoom["border"] = "0"
 zoom.grid(row=1,column=1,padx=100, pady=50)
 
-# Return to default screen button
+# Return to default screen (close the magnifier) button
 default_image = tk.PhotoImage(file="img\\functions\\default.png").subsample(2)
 default = tk.Button(window, command = lambda: returnToDefault(root), image=default_image)
 default["border"] = "0"
