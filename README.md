@@ -26,6 +26,7 @@ Looking above the screen opens **mouse functions menu** with 6 buttons allowing 
 * copy
 * paste
 * hold scroll button
+
 All of the functions are activated by clicking respective button by holding your gaze (cursor) on it.
 
 Looking below the screen opens **additional functions menu** which contains buttons allowing you to:
