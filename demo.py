@@ -45,6 +45,12 @@ margin = 0.15 * screen_height
 Eye.screen_px_matrix = [[[margin,margin],[screen_width/2,margin],[screen_width-margin,margin]],
                         [[margin,screen_height/2],[screen_width/2,screen_height/2],[screen_width-margin,screen_height/2]],
                         [[margin,screen_height-margin],[screen_width/2, screen_height-margin],[screen_width-margin, screen_height-margin]]]
+
+# Counters
+top_counter = 0
+bottom_counter = 0
+left_counter = 0
+right_counter = 0
                         
 
 while True:
@@ -155,42 +161,81 @@ while True:
                 cursor.setCursorPosition(cursor_x, cursor_y, screen_width, screen_height)
 
                 # Perform a left mouse button click if cursor is stationary for long enough
+                # and is located roughly on the screen area
                 cursor.stationary_counter += 1
-                if(cursor.stationary_counter > 30):
+                if(cursor.stationary_counter > 30 
+                and cursor_x > 0-100 and cursor_x < screen_width+100 and cursor_y > 0-100 and cursor_y < screen_height+100):
                     autopy.mouse.click()
                     cursor.stationary_counter = 0
 
-                # Open functions menu if looking below the screen
-                if(cursor_y > screen_height + 700):        
-                    if(functions_menu is None):
-                        functions_menu = Popen('python functions_menu.py')
-                    else:
-                        poll = functions_menu.poll()
-                        if(poll is not None):
+                # Open functions menu if looking below the screen for long enough
+                if(cursor_y > screen_height+300 and cursor_x > 0 and cursor_x < screen_width):  
+                    
+                    bottom_counter += 1
+                
+                    if(bottom_counter == 20):      
+                        if(functions_menu is None):
                             functions_menu = Popen('python functions_menu.py')
+                        else:
+                            poll = functions_menu.poll()
+                            if(poll is not None):
+                                functions_menu = Popen('python functions_menu.py')
+                    
+                    elif(bottom_counter > 20):
+                        bottom_counter = 0
+                else:
+                    bottom_counter = 0
 
-                # Open mouse menu if looking above the screen
-                if(cursor_y < 0 - 500):        
-                    if(mouse_menu is None):
-                        mouse_menu = Popen('python mouse_menu.py')
-                    else:
-                        poll = mouse_menu.poll()
-                        if(poll is not None):
+                # Open mouse menu if looking above the screen for long enough
+                if(cursor_y < 0-500 and cursor_x > 0.1*screen_width and cursor_x < 0.9*screen_width):   
+
+                    top_counter += 1
+                    
+                    if(top_counter == 20):     
+                        if(mouse_menu is None):
                             mouse_menu = Popen('python mouse_menu.py')
+                        else:
+                            poll = mouse_menu.poll()
+                            if(poll is not None):
+                                mouse_menu = Popen('python mouse_menu.py')
 
-                # Open keyboard if looking to the left of the screen
-                if(cursor_x < 0 - 500):        
-                    if(keyboard is None):
-                        keyboard = Popen("osk.exe", shell = True)
-                    else:
-                        poll = keyboard.poll()
-                        if(poll is not None):
+                    elif(bottom_counter > 20):
+                        bottom_counter = 0
+                else:
+                    top_counter = 0
+
+                # Open keyboard if looking to the left of the screen for long enough
+                if(cursor_x < 0-300 and cursor_y > 0.1*screen_height and cursor_y < 0.9*screen_height):   
+
+                    left_counter += 1
+
+                    if(left_counter == 20):
+                        if(keyboard is None):
                             keyboard = Popen("osk.exe", shell = True)
+                        else:
+                            poll = keyboard.poll()
+                            if(poll is not None):
+                                keyboard = Popen("osk.exe", shell = True)
+                    
+                    elif(left_counter > 20):
+                        left_counter = 0
+                else:
+                    left_counter = 0
 
-                # Close keyboard if looking to the right of the screen
-                if(cursor_x > screen_width + 500):        
-                    if(keyboard is not None):
-                        Popen("wmic process where name='osk.exe' delete", shell = True)
+                # Close keyboard if looking to the right of the screen for long enough
+                if(cursor_x > screen_width+300 and cursor_y > 0.1*screen_height and cursor_y < 0.9*screen_height): 
+
+                    right_counter += 1
+
+                    if(right_counter == 20):
+                        if(keyboard is not None):
+                            Popen("wmic process where name='osk.exe' delete", shell = True)
+                    
+                    elif(right_counter > 20):
+                        right_counter = 0
+                        
+                else:
+                    right_counter = 0
 
                 autopy.mouse.move(cursor.coordinates[0], cursor.coordinates[1])
             
