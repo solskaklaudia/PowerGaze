@@ -65,7 +65,9 @@ def simulatePaste(root):
 
 def simulateScroll(root):
     root.destroy()
-    mouse.scroll(0, 2)
+    autopy.mouse.toggle(autopy.mouse.Button.MIDDLE, True)
+    time.sleep(3)
+    autopy.mouse.toggle(autopy.mouse.Button.MIDDLE, False)
 
 
 """ Contents """

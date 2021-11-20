@@ -1,5 +1,8 @@
+from ctypes import pythonapi
 import tkinter as tk
 from subprocess import Popen
+from pyautogui import press, hotkey
+import time
 
 root = tk.Tk()
 root.attributes('-alpha', 0.0)
@@ -22,6 +25,11 @@ window.attributes('-topmost', 1)            # display on top
 def zoomIn(root):
     root.destroy()
     Popen("Magnify.exe", shell=True)
+    # Perform zoom in and out hotkey to get rid of magnifier frame
+    time.sleep(5)  
+    hotkey("win", "+")
+    press("backspace") # removes the '+'
+    hotkey("win", "-")
 
 def returnToDefault(root):
     root.destroy()

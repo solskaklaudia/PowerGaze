@@ -169,11 +169,11 @@ while True:
                     cursor.stationary_counter = 0
 
                 # Open functions menu if looking below the screen for long enough
-                if(cursor_y > screen_height+300 and cursor_x > 0 and cursor_x < screen_width):  
+                if(cursor_y > screen_height+200 and cursor_x > 0 and cursor_x < screen_width):  
                     
                     bottom_counter += 1
                 
-                    if(bottom_counter == 20):      
+                    if(bottom_counter == 30):      
                         if(functions_menu is None):
                             functions_menu = Popen('python functions_menu.py')
                         else:
@@ -181,17 +181,17 @@ while True:
                             if(poll is not None):
                                 functions_menu = Popen('python functions_menu.py')
                     
-                    elif(bottom_counter > 20):
+                    elif(bottom_counter > 30):
                         bottom_counter = 0
                 else:
                     bottom_counter = 0
 
                 # Open mouse menu if looking above the screen for long enough
-                if(cursor_y < 0-500 and cursor_x > 0.1*screen_width and cursor_x < 0.9*screen_width):   
+                if(cursor_y < 0-200 and cursor_x > 0.1*screen_width and cursor_x < 0.9*screen_width):   
 
                     top_counter += 1
                     
-                    if(top_counter == 20):     
+                    if(top_counter == 30):     
                         if(mouse_menu is None):
                             mouse_menu = Popen('python mouse_menu.py')
                         else:
@@ -199,17 +199,17 @@ while True:
                             if(poll is not None):
                                 mouse_menu = Popen('python mouse_menu.py')
 
-                    elif(bottom_counter > 20):
-                        bottom_counter = 0
+                    elif(top_counter > 30):
+                        top_counter = 0
                 else:
                     top_counter = 0
 
                 # Open keyboard if looking to the left of the screen for long enough
-                if(cursor_x < 0-300 and cursor_y > 0.1*screen_height and cursor_y < 0.9*screen_height):   
+                if(cursor_x < 0-200 and cursor_y > 0.1*screen_height and cursor_y < 0.9*screen_height):   
 
                     left_counter += 1
 
-                    if(left_counter == 20):
+                    if(left_counter == 30):
                         if(keyboard is None):
                             keyboard = Popen("osk.exe", shell = True)
                         else:
@@ -217,21 +217,21 @@ while True:
                             if(poll is not None):
                                 keyboard = Popen("osk.exe", shell = True)
                     
-                    elif(left_counter > 20):
+                    elif(left_counter > 30):
                         left_counter = 0
                 else:
                     left_counter = 0
 
                 # Close keyboard if looking to the right of the screen for long enough
-                if(cursor_x > screen_width+300 and cursor_y > 0.1*screen_height and cursor_y < 0.9*screen_height): 
+                if(cursor_x > screen_width+200 and cursor_y > 0.1*screen_height and cursor_y < 0.9*screen_height): 
 
                     right_counter += 1
 
-                    if(right_counter == 20):
+                    if(right_counter == 30):
                         if(keyboard is not None):
                             Popen("wmic process where name='osk.exe' delete", shell = True)
                     
-                    elif(right_counter > 20):
+                    elif(right_counter > 30):
                         right_counter = 0
                         
                 else:
