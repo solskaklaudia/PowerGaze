@@ -1,4 +1,3 @@
-from ctypes import pythonapi
 import tkinter as tk
 from subprocess import Popen
 from pyautogui import press, hotkey
@@ -28,7 +27,7 @@ def zoomIn(root):
     # Perform zoom in and out hotkey to get rid of magnifier frame
     time.sleep(5)  
     hotkey("win", "+")
-    press("backspace") # removes the '+'
+    press("backspace")                      # removes the '+'
     hotkey("win", "-")
 
 def returnToDefault(root):
