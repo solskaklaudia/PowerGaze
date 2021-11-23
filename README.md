@@ -32,10 +32,11 @@ All of the functions are activated by clicking respective button by holding your
 Looking below the screen opens **additional functions menu** which contains buttons allowing you to:
 * open magnifier
 * close the magnifier (go back to default 100% sized screen)
-* redo the callibration process
 * exit the menu
 
-Looking to the left of the screen opens Windows On-Screen Keyboard, and looking to the right of the screen - closes the keyboard.
+Looking to the left of the screen opens and closes Windows On-Screen Keyboard.
+
+Looking to the right of the screen causes the calibration process to start again (recalibrate).
 
 To exit the software, press 'Esc' key when demo.py camera screen is opened.
 
