@@ -29,6 +29,7 @@ cursor = Cursor()
 
 functions_menu = None
 mouse_menu = None
+keyboard_opened = False
 
 # Calibration variables
 calibrated = False
@@ -50,9 +51,7 @@ top_counter = 0
 bottom_counter = 0
 left_counter = 0
 right_counter = 0
-
-keyboard_opened = False
-                        
+                   
 
 while True:
 
