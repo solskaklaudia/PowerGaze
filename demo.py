@@ -29,7 +29,6 @@ cursor = Cursor()
 
 functions_menu = None
 mouse_menu = None
-keyboard = None
 
 # Calibration variables
 calibrated = False
@@ -51,6 +50,8 @@ top_counter = 0
 bottom_counter = 0
 left_counter = 0
 right_counter = 0
+
+keyboard_opened = False
                         
 
 while True:
@@ -204,33 +205,35 @@ while True:
                 else:
                     top_counter = 0
 
-                # Open keyboard if looking to the left of the screen for long enough
+                # Open or close keyboard if looking to the left of the screen for long enough
                 if(cursor_x < 0-200 and cursor_y > 0.1*screen_height and cursor_y < 0.9*screen_height):   
 
                     left_counter += 1
 
                     if(left_counter == 30):
-                        if(keyboard is None):
-                            keyboard = Popen("osk.exe", shell = True)
+                        if(keyboard_opened == False):                               
+                            Popen("osk.exe", shell = True)
+                            keyboard_opened = True
                         else:
-                            poll = keyboard.poll()
-                            if(poll is not None):
-                                keyboard = Popen("osk.exe", shell = True)
+                            Popen("wmic process where name='osk.exe' delete", shell = True)
+                            keyboard_opened = False 
                     
                     elif(left_counter > 30):
                         left_counter = 0
                 else:
                     left_counter = 0
 
-                # Close keyboard if looking to the right of the screen for long enough
+                # Redo calibration if looking to the right of the screen for long enough
                 if(cursor_x > screen_width+200 and cursor_y > 0.1*screen_height and cursor_y < 0.9*screen_height): 
 
                     right_counter += 1
 
                     if(right_counter == 30):
-                        if(keyboard is not None):
-                            Popen("wmic process where name='osk.exe' delete", shell = True)
-                    
+                        calibrated = False
+                        calibration_finished = False
+                        p1r, p2r, p3r, p4r, p5r, p6r, p7r, p8r, p9r = ([] for i in range(9))
+                        p1l, p2l, p3l, p4l, p5l, p6l, p7l, p8l, p9l = ([] for i in range(9))
+
                     elif(right_counter > 30):
                         right_counter = 0
                         

@@ -56,23 +56,17 @@ default = tk.Button(window, command = lambda: returnToDefault(root), image=defau
 default["border"] = "0"
 default.grid(row=1,column=2,padx=100, pady=50)
 
-# Calibrate the system button
-calibrate_image = tk.PhotoImage(file="img\\functions\\calibrate.png").subsample(2)
-calibrate = tk.Button(window, command = lambda: redoCalibation(root), image=calibrate_image)
-calibrate["border"] = "0"
-calibrate.grid(row=2,column=1,padx=100, pady=50)
-
 # Exit menu button
 exit_image = tk.PhotoImage(file="img\\functions\\exit.png").subsample(2)
 exit = tk.Button(window, command = lambda: exitMenu(root), image=exit_image)
 exit["border"] = "0"
-exit.grid(row=2,column=2,padx=100, pady=50)
+exit.grid(row=1,column=3,padx=100, pady=50)
 
 # Center the buttons
 window.rowconfigure(0, weight=1)
-window.rowconfigure(3, weight=1)
+window.rowconfigure(2, weight=1)
 window.columnconfigure(0, weight=1)
-window.columnconfigure(3, weight=1)
+window.columnconfigure(4, weight=1)
 
 
 window.mainloop()
