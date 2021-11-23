@@ -158,33 +158,33 @@ while True:
 
             t = time.time() - calibration_start
 
-            if(int(t) == offset+1):
+            if(t > offset+1 and t < offset+2):
                 p1r.append(right_eye.sight_angle.copy())
                 p1l.append(left_eye.sight_angle.copy())
-            elif(int(t) == offset+3):
+            elif(t > offset+3 and t < offset+4):
                 p2r.append(right_eye.sight_angle.copy())
                 p2l.append(left_eye.sight_angle.copy())
-            elif(int(t) == offset+5):
+            elif(t > offset+5 and t < offset+6):
                 p3r.append(right_eye.sight_angle.copy())
                 p3l.append(left_eye.sight_angle.copy())
 
-            elif(int(t) == offset+7):
+            elif(t > offset+7 and t < offset+8):
                 p4r.append(right_eye.sight_angle.copy())
                 p4l.append(left_eye.sight_angle.copy())
-            elif(int(t) == offset+9):
+            elif(t > offset+9 and t < offset+10):
                 p5r.append(right_eye.sight_angle.copy())
                 p5l.append(left_eye.sight_angle.copy())
-            elif(int(t) == offset+11):
+            elif(t > offset+11 and t < offset+12):
                 p6r.append(right_eye.sight_angle.copy())
                 p6l.append(left_eye.sight_angle.copy())
 
-            elif(int(t) == offset+13):
+            elif(t > offset+13 and t < offset+14):
                 p7r.append(right_eye.sight_angle.copy())
                 p7l.append(left_eye.sight_angle.copy())
-            elif(int(t) == offset+15):
+            elif(t > offset+15 and t < offset+16):
                 p8r.append(right_eye.sight_angle.copy())
                 p8l.append(left_eye.sight_angle.copy())
-            elif(int(t) == offset+17):
+            elif(t > offset+17 and t < offset+18):
                 p9r.append(right_eye.sight_angle.copy())
                 p9l.append(left_eye.sight_angle.copy())
             
