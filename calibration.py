@@ -24,7 +24,7 @@ info = "Podążaj wzrokiem za pojawiającymi się punktami w celu kalibracji sys
 canvas.create_text(screen_width/2, screen_height/2, fill="red", font="Arial 30 bold", text=info, tags="info")
 
 root.update()
-time.sleep(2)
+time.sleep(3)
 
 # clear the canvas
 canvas.delete("info")
@@ -110,3 +110,23 @@ animateCircle()
 
 canvas.move("circle", int(screen_width/2-2*margin), 0)
 animateCircle()
+
+
+# clear the canvas
+canvas.delete("circle")
+
+# display quick usage instructions after calibration
+screen_above = "⬆ funkcje myszy"               # mouse functions
+screen_below = "⬇ przybliżanie ekranu"         # screen magnifier
+screen_left = "⬅ otwórz/zamknij klawiaturę"    # open/close keyboard
+screen_right = "ponowna kalibracja ➡"          # recalibrate
+
+canvas.create_text(screen_width/2, screen_height/5, fill="red", font="Arial 30 bold", text=screen_above)
+canvas.create_text(screen_width/2, screen_height*4/5, fill="red", font="Arial 30 bold", text=screen_below)
+canvas.create_text(screen_width/5, screen_height/2, fill="red", font="Arial 30 bold", text=screen_left)
+canvas.create_text(screen_width*4/5, screen_height/2, fill="red", font="Arial 30 bold", text=screen_right)
+
+root.update()
+
+time.sleep(3)
+

@@ -34,6 +34,7 @@ keyboard_opened = False
 # Calibration variables
 calibrated = False
 calibration_finished = False
+offset = 4 
 
 p1r, p2r, p3r, p4r, p5r, p6r, p7r, p8r, p9r = ([] for i in range(9))
 p1l, p2l, p3l, p4l, p5l, p6l, p7l, p8l, p9l = ([] for i in range(9))
@@ -112,38 +113,38 @@ while True:
 
             t = time.time() - calibration_start
 
-            if(int(t) == 3):
+            if(int(t) == offset+1):
                 p1r.append(right_eye.sight_angle.copy())
                 p1l.append(left_eye.sight_angle.copy())
-            elif(int(t) == 5):
+            elif(int(t) == offset+3):
                 p2r.append(right_eye.sight_angle.copy())
                 p2l.append(left_eye.sight_angle.copy())
-            elif(int(t) == 7):
+            elif(int(t) == offset+5):
                 p3r.append(right_eye.sight_angle.copy())
                 p3l.append(left_eye.sight_angle.copy())
 
-            elif(int(t) == 9):
+            elif(int(t) == offset+7):
                 p4r.append(right_eye.sight_angle.copy())
                 p4l.append(left_eye.sight_angle.copy())
-            elif(int(t) == 11):
+            elif(int(t) == offset+9):
                 p5r.append(right_eye.sight_angle.copy())
                 p5l.append(left_eye.sight_angle.copy())
-            elif(int(t) == 13):
+            elif(int(t) == offset+11):
                 p6r.append(right_eye.sight_angle.copy())
                 p6l.append(left_eye.sight_angle.copy())
 
-            elif(int(t) == 15):
+            elif(int(t) == offset+13):
                 p7r.append(right_eye.sight_angle.copy())
                 p7l.append(left_eye.sight_angle.copy())
-            elif(int(t) == 17):
+            elif(int(t) == offset+15):
                 p8r.append(right_eye.sight_angle.copy())
                 p8l.append(left_eye.sight_angle.copy())
-            elif(int(t) == 19):
+            elif(int(t) == offset+17):
                 p9r.append(right_eye.sight_angle.copy())
                 p9l.append(left_eye.sight_angle.copy())
             
 
-            if(t > 20 and calibration_finished == False):
+            if(t > offset+21 and calibration_finished == False):
 
                 right_eye.calibrate(p1r, p2r, p3r, p4r, p5r, p6r, p7r, p8r, p9r)
                 left_eye.calibrate(p1l, p2l, p3l, p4l, p5l, p6l, p7l, p8l, p9l)
