@@ -6,6 +6,7 @@ from Cursor import *
 import autopy
 from subprocess import Popen
 import time
+import tkinter as tk
 
 webcam = cv2.VideoCapture(0)
 
@@ -52,7 +53,51 @@ top_counter = 0
 bottom_counter = 0
 left_counter = 0
 right_counter = 0
-                   
+
+cursor_x = 0
+cursor_y = 0
+
+
+""" Select eye configuration """
+
+eyes_config = "both" # default value
+
+def conf_eyes(conf):
+    global eyes_config
+    eyes_config = conf
+    window.destroy()
+
+window = tk.Tk()
+window.title("PowerGaze")
+
+info = tk.Label(text="Wybierz konfigurację systemu:", font="Arial 20 bold")
+info.grid(row=1, column=2, padx=80, pady=50)
+
+# Both eyes button
+both_button = tk.Button(window, command=lambda:conf_eyes("both"), text="Oboje oczu", font="Arial 15 bold", bg="orange", width=25, height=5)
+both_button["border"] = "0"
+both_button.grid(row=2,column=1,padx=80, pady=80)
+
+# Left eye button
+left_button = tk.Button(window, command=lambda:conf_eyes("left"), text="Lewe oko", font="Arial 15 bold", bg="orange", width=25, height=5)
+left_button["border"] = "0"
+left_button.grid(row=2,column=2,padx=80, pady=80)
+
+# Right eye button
+right_button = tk.Button(window, command=lambda:conf_eyes("right"), text="Prawe oko", font="Arial 15 bold", bg="orange", width=25, height=5)
+right_button["border"] = "0"
+right_button.grid(row=2,column=3,padx=80, pady=80)
+
+window.rowconfigure(0, weight=1)
+window.rowconfigure(3, weight=1)
+window.columnconfigure(0, weight=1)
+window.columnconfigure(4, weight=1)
+
+window.attributes('-fullscreen', True)
+window.mainloop()
+
+
+""" Main loop """ 
 
 while True:
 
@@ -156,8 +201,15 @@ while True:
 
             if(calibration_finished == True):
 
-                cursor_x = (right_eye.avg_cursor[0] + left_eye.avg_cursor[0]) / 2
-                cursor_y = (right_eye.avg_cursor[1] + left_eye.avg_cursor[1]) / 2
+                if(eyes_config == "both"):
+                    cursor_x = (right_eye.avg_cursor[0] + left_eye.avg_cursor[0]) / 2
+                    cursor_y = (right_eye.avg_cursor[1] + left_eye.avg_cursor[1]) / 2
+                elif(eyes_config == "left"):
+                    cursor_x = left_eye.avg_cursor[0]
+                    cursor_y = left_eye.avg_cursor[1]
+                elif(eyes_config == "right"):
+                    cursor_x = right_eye.avg_cursor[0]
+                    cursor_y = right_eye.avg_cursor[1]
 
                 cursor.setCursorPosition(cursor_x, cursor_y, screen_width, screen_height)
 
