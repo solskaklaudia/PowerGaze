@@ -44,7 +44,7 @@ def animateCircle():
     canvas.itemconfig("circle", width = int(circle_size/24), fill = "orange", outline = "orange")
     root.update()
     time.sleep(0.5)
-    canvas.itemconfig("circle", width = int(circle_size/48), fill = "yellow", outline = "yellow")
+    canvas.itemconfig("circle", width = int(circle_size/48), fill = "gold", outline = "gold")
     root.update()
     time.sleep(0.5)
 

@@ -28,6 +28,7 @@ window.attributes('-topmost', 1)            # display on top
 
 def simulateDrag(root):
     root.destroy()
+    time.sleep(2)
     autopy.mouse.toggle(autopy.mouse.Button.LEFT, True)
     time.sleep(3)
     autopy.mouse.toggle(autopy.mouse.Button.LEFT, False)
@@ -35,6 +36,7 @@ def simulateDrag(root):
 
 def doubleClick(root):
     root.destroy()
+    time.sleep(2)
     autopy.mouse.click()
     time.sleep(.1)
     autopy.mouse.click()
@@ -42,6 +44,7 @@ def doubleClick(root):
 
 def rightClick(root):
     root.destroy()
+    time.sleep(2)
     autopy.mouse.toggle(autopy.mouse.Button.RIGHT, True)
     time.sleep(.1)
     autopy.mouse.toggle(autopy.mouse.Button.RIGHT, False)
@@ -49,6 +52,7 @@ def rightClick(root):
 
 def simulateCopy(root):
     root.destroy()
+    time.sleep(2)
     keyboard.press(Key.ctrl)
     keyboard.press('c')
     keyboard.release('c')
@@ -57,6 +61,7 @@ def simulateCopy(root):
 
 def simulatePaste(root):
     root.destroy()
+    time.sleep(2)
     keyboard.press(Key.ctrl)
     keyboard.press('v')
     keyboard.release('v')
@@ -65,6 +70,7 @@ def simulatePaste(root):
 
 def simulateScroll(root):
     root.destroy()
+    time.sleep(2)
     autopy.mouse.toggle(autopy.mouse.Button.MIDDLE, True)
     time.sleep(3)
     autopy.mouse.toggle(autopy.mouse.Button.MIDDLE, False)
