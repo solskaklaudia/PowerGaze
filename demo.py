@@ -37,8 +37,8 @@ calibrated = False
 calibration_finished = False
 offset = 4 
 
-p1r, p2r, p3r, p4r, p5r, p6r, p7r, p8r, p9r = ([] for i in range(9))
-p1l, p2l, p3l, p4l, p5l, p6l, p7l, p8l, p9l = ([] for i in range(9))
+p1r, p2r, p3r, p4r, p5r, p6r, p7r, p8r, p9r = ([] for _ in range(9))
+p1l, p2l, p3l, p4l, p5l, p6l, p7l, p8l, p9l = ([] for _ in range(9))
 
 screen_width, screen_height = autopy.screen.size()
 
@@ -123,7 +123,7 @@ while True:
             """ Calculate head and sight parameters """
 
             # Head angle detection in relation to the camera
-            head.calcAngles(frame, landmarks, visualize=False)
+            head.calcAngles(landmarks)
 
             # Set pupil centers as iris centers from mediapipe landmarks
             left_eye.setPupil([landmarks[473].x*frame.shape[1], landmarks[473].y*frame.shape[0]])
@@ -277,14 +277,22 @@ while True:
 
                 # Redo calibration if looking to the right of the screen for long enough
                 if(cursor_x > screen_width+200 and cursor_y > 0.1*screen_height and cursor_y < 0.9*screen_height): 
-
+           
                     right_counter += 1
 
                     if(right_counter == 30):
+
+                        # Close keyboard and magnifier if opened
+                        if(keyboard_opened == True):                               
+                            Popen("wmic process where name='osk.exe' delete", shell = True)
+                            keyboard_opened = False
+                        Popen("wmic process where name='Magnify.exe' delete", shell = True)
+
+                        # Reset calibration parameters
                         calibrated = False
                         calibration_finished = False
-                        p1r, p2r, p3r, p4r, p5r, p6r, p7r, p8r, p9r = ([] for i in range(9))
-                        p1l, p2l, p3l, p4l, p5l, p6l, p7l, p8l, p9l = ([] for i in range(9))
+                        p1r, p2r, p3r, p4r, p5r, p6r, p7r, p8r, p9r = ([] for _ in range(9))
+                        p1l, p2l, p3l, p4l, p5l, p6l, p7l, p8l, p9l = ([] for _ in range(9))
 
                     elif(right_counter > 30):
                         right_counter = 0
@@ -297,23 +305,23 @@ while True:
 
             """ Draw calculated values on frame """
 
-            # draw smoothed pupil centers on the frame
+            # Draw smoothed pupil centers on the frame
             cv2.circle(frame, (int(left_eye.avg_coords[0]), int(left_eye.avg_coords[1])), 1, (0, 0, 255), 2)
             cv2.circle(frame, (int(right_eye.avg_coords[0]), int(right_eye.avg_coords[1])), 1, (0, 0, 255), 2)
 
-            # draw eye middle points on the frame
+            # Draw eye middle points on the frame
             cv2.circle(frame, (int(left_eye.avg_middle[0]), int(left_eye.avg_middle[1])), 1, (255, 0, 0), 2)
             cv2.circle(frame, (int(right_eye.avg_middle[0]), int(right_eye.avg_middle[1])), 1, (255, 0, 0), 2)
 
-            # draw values of roll, yaw and pitch angles
+            # Draw values of roll, yaw and pitch angles
             cv2.putText(frame, "roll: " + str(head.roll), (50, 50), cv2.FONT_HERSHEY_DUPLEX, 0.9, (147, 58, 31), 1)
             cv2.putText(frame, "yaw: " + str(head.yaw), (50, 80), cv2.FONT_HERSHEY_DUPLEX, 0.9, (147, 58, 31), 1)
             cv2.putText(frame, "pitch: " + str(head.pitch), (50, 110), cv2.FONT_HERSHEY_DUPLEX, 0.9, (147, 58, 31), 1)
 
-            # draw estimated camera distance change
+            # Draw estimated camera distance change
             cv2.putText(frame, "camera distance: " + str(head.camera_distance), (50, 170), cv2.FONT_HERSHEY_DUPLEX, 0.9, (147, 58, 31), 1)
 
-            # draw text if blinking yes/no
+            # Draw text if blinking yes/no
             if(left_eye.opened == True and right_eye.opened == True):
                 blink = "no"
             else: 
@@ -321,13 +329,13 @@ while True:
 
             cv2.putText(frame, "blinking: " + blink, (50, 140), cv2.FONT_HERSHEY_DUPLEX, 0.9, (147, 58, 31), 1)
 
-            # draw sight angles values
+            # Draw sight angles values
             cv2.putText(frame, "right eye angle x: " + str(right_eye.sight_angle[0]), (50, 230), cv2.FONT_HERSHEY_DUPLEX, 0.9, (147, 58, 31), 1)
             cv2.putText(frame, "right eye angle y: " + str(right_eye.sight_angle[1]), (50, 260), cv2.FONT_HERSHEY_DUPLEX, 0.9, (147, 58, 31), 1)
             cv2.putText(frame, "left eye angle x: " + str(left_eye.sight_angle[0]), (50, 290), cv2.FONT_HERSHEY_DUPLEX, 0.9, (147, 58, 31), 1)
             cv2.putText(frame, "left eye angle y: " + str(left_eye.sight_angle[1]), (50, 320), cv2.FONT_HERSHEY_DUPLEX, 0.9, (147, 58, 31), 1)
 
-            # draw cursor coordinates
+            # Draw cursor coordinates
             cv2.putText(frame, "cursor x: " + str(cursor.coordinates[0]), (50, 350), cv2.FONT_HERSHEY_DUPLEX, 0.9, (147, 58, 31), 1)
             cv2.putText(frame, "cursor y: " + str(cursor.coordinates[1]), (50, 380), cv2.FONT_HERSHEY_DUPLEX, 0.9, (147, 58, 31), 1) 
 

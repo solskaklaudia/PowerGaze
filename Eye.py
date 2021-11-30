@@ -84,7 +84,7 @@ class Eye:
     def smoothCursorMovement(self, c_coords):
         """ Smooths cursor movement using weighed moving average """
 
-        # append the sample when less than max cursor samples and calculate average
+        # Append the sample when less than max cursor samples and calculate average
         if len(self.cursor_coords) <= self.max_cursor_samples:
             self.cursor_coords.append(c_coords)
             avg_x = 0
@@ -99,7 +99,7 @@ class Eye:
             self.avg_cursor[0] = avg_x/weighs_sum
             self.avg_cursor[1] = avg_y/weighs_sum
 
-        # when max samples reached, accept only those which differ more than given number of pixels
+        # When max samples reached, accept only those which differ more than given number of pixels
         diff_x = abs(self.cursor_coords[len(self.cursor_coords)-1][0] - c_coords[0])
         diff_y = abs(self.cursor_coords[len(self.cursor_coords)-1][1] - c_coords[1])
 
@@ -158,11 +158,11 @@ class Eye:
     def calcAngle(self):
         """ Calculates angle od the sight in x and y directions """
 
-        # distance between middle and pupil center in x and y directions
+        # Distance between middle and pupil center in x and y directions
         pup_dist_x = self.avg_middle[0] - self.avg_coords[0]
         pup_dist_y = self.avg_middle[1] - self.avg_coords[1]
 
-        # calculates sight angle
+        # Calculates sight angle
         self.sight_angle[0] = math.atan(pup_dist_x / self.eye_width) * 180 / math.pi
         self.sight_angle[1] = math.atan(pup_dist_y / self.eye_width) * 180 / math.pi
 
@@ -173,10 +173,10 @@ class Eye:
         train_pts = np.float32(self.screen_px_matrix).reshape(-1,1,2)
         query_pts = np.float32(self.sight_angle_matrix).reshape(-1,1,2)
 
-        # finds homography using least squares method
+        # Finds homography using least squares method
         matrix, _ = cv2.findHomography(query_pts, train_pts, 0)
 
-        # calculates cursor position
+        # Calculates cursor position
         pts = np.float32([self.sight_angle]).reshape(-1,1,2)
         self.cursor = cv2.perspectiveTransform(pts,matrix).flatten()
 
@@ -186,20 +186,18 @@ class Eye:
     def detectBlink(self, landmarks):
         """ Detects eye blinking using height to width ratio """
 
-        # eye height to width ratio threshold considered as blink
+        # Eye height to width ratio threshold considered as blink
         blink_ratio = 0.4
 
-        # calculate eye width and height using eye landmarks - left corner, right corner, top, bottom
+        # Calculate eye width and height using eye landmarks - left corner, right corner, top, bottom
         eye_width = lineLength([(landmarks[0].x),(landmarks[0].y),(landmarks[0].z)] , [(landmarks[1].x),(landmarks[1].y),(landmarks[1].z)])
         eye_height = lineLength([(landmarks[2].x),(landmarks[2].y),(landmarks[2].z)] , [(landmarks[3].x),(landmarks[3].y),(landmarks[3].z)])
 
-        # calculate eye height to width ratio
+        # Calculate eye height to width ratio
         eye_ratio = eye_height / eye_width
 
-        # check for eye blinks
+        # Check for eye blinks
         if(eye_ratio <= blink_ratio):
             self.opened = False
         else:
             self.opened = True
-
-       

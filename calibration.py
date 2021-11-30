@@ -7,7 +7,7 @@ root.attributes('-alpha', 0.0)
 root.iconify()
 window = tk.Toplevel(root)
 
-# get screen width and height
+# Get screen width and height
 screen_width = root.winfo_screenwidth()     # width of the screen
 screen_height = root.winfo_screenheight()   # height of the screen
 
@@ -19,34 +19,32 @@ window.attributes('-topmost', 1)            # display on top
 canvas = tk.Canvas(window, width = screen_width, height = screen_height)
 canvas.pack()
 
-# display informational text before calibration
+# Display informational text before calibration
 info = "Podążaj wzrokiem za pojawiającymi się punktami w celu kalibracji systemu."
 canvas.create_text(screen_width/2, screen_height/2, fill="red", font="Arial 30 bold", text=info, tags="info")
 
 root.update()
 time.sleep(3)
 
-# clear the canvas
+# Clear the canvas
 canvas.delete("info")
 root.update()
 
 margin = int(0.05 * screen_height)
 circle_size = int(0.1 * screen_height)
 
+# Animation functions
+def setCircle(size, color):
+    canvas.itemconfig("circle", width = size, fill = color, outline = color)
+    root.update()
+    time.sleep(0.5)
 
 def animateCircle():
-    canvas.itemconfig("circle", width = int(circle_size/6), fill = "green", outline = "green")
-    root.update()
-    time.sleep(0.5)
-    canvas.itemconfig("circle", width = int(circle_size/12), fill = "red", outline = "red")
-    root.update()
-    time.sleep(0.5)
-    canvas.itemconfig("circle", width = int(circle_size/24), fill = "orange", outline = "orange")
-    root.update()
-    time.sleep(0.5)
-    canvas.itemconfig("circle", width = int(circle_size/48), fill = "gold", outline = "gold")
-    root.update()
-    time.sleep(0.5)
+    setCircle(int(circle_size/6), "green")
+    setCircle(int(circle_size/12), "red")
+    setCircle(int(circle_size/24), "orange")
+    setCircle(int(circle_size/48), "gold")
+
 
 # O  -  -
 # -  -  -
@@ -129,4 +127,3 @@ canvas.create_text(screen_width*4/5, screen_height/2, fill="red", font="Arial 30
 root.update()
 
 time.sleep(3)
-

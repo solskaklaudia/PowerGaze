@@ -9,7 +9,7 @@ root.attributes('-alpha', 0.0)
 root.iconify()
 window = tk.Toplevel(root)
 
-# get screen width and height
+# Get screen width and height
 screen_width = root.winfo_screenwidth()     # width of the screen
 screen_height = root.winfo_screenheight()   # height of the screen
 
@@ -33,10 +33,6 @@ def zoomIn(root):
 def returnToDefault(root):
     root.destroy()
     Popen("wmic process where name='Magnify.exe' delete", shell = True)
-
-def redoCalibation(root):
-    root.destroy()
-    print("calibrate")
 
 def exitMenu(root):
     root.destroy()

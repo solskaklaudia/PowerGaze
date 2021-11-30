@@ -4,7 +4,6 @@ import time
 from pynput.keyboard import Key, Controller
 from pynput.mouse import Controller as MouseController
 
-
 keyboard = Controller()
 mouse = MouseController()
 
@@ -14,7 +13,7 @@ root.attributes('-alpha', 0.0)
 root.iconify()
 window = tk.Toplevel(root)
 
-# get screen width and height
+# Get screen width and height
 screen_width = root.winfo_screenwidth()     # width of the screen
 screen_height = root.winfo_screenheight()   # height of the screen
 
@@ -95,7 +94,6 @@ right_click_image = tk.PhotoImage(file="img\\mouse\\right_click.png").subsample(
 right_click = tk.Button(window, command = lambda: rightClick(root), image=right_click_image)
 right_click["border"] = "0"
 right_click.grid(row=1,column=3,padx=80, pady=50)
-
 
 # Copy button
 copy_image = tk.PhotoImage(file="img\\mouse\\copy.png").subsample(2)
